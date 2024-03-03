@@ -1,3 +1,5 @@
+local utils = require('meuambiente.utils')
+
 ---@enum InstanceFocus
 local INSTANCEFOCUS = {
 	terminal = 1,
@@ -5,7 +7,7 @@ local INSTANCEFOCUS = {
 }
 
 ---@class TerminalInstance
----@field buf_id integer
+---@field buf_id integer | nil
 ---@field term_id integer
 ---@field state State
 ---@field cur_focus InstanceFocus
@@ -15,8 +17,10 @@ TerminalInstance.__index = TerminalInstance
 
 
 ---@param state State
-function TerminalInstance.new(state)
+---@param bind_term? boolean
+function TerminalInstance.new(state, bind_term)
 	-- Get current buffer id.
+	---@type integer | nil
 	local buf_id = vim.api.nvim_get_current_buf()
 
 	-- Get current buffer directory.
@@ -30,6 +34,11 @@ function TerminalInstance.new(state)
 
 	-- Get terminal id.
 	local term_id = vim.api.nvim_get_current_buf()
+
+	-- Check if it has to bind or if the current buffer is unnamed.
+	if bind_term == false or utils.is_cur_unnamed() == true then
+		buf_id = nil
+	end
 
 	local instance = setmetatable({
 		buf_id = buf_id,
@@ -54,9 +63,25 @@ function TerminalInstance:focus()
 		self.cur_focus = INSTANCEFOCUS.terminal
 		vim.api.nvim_set_current_buf(self.term_id)
 	else
-		self.cur_focus = INSTANCEFOCUS.file
-		vim.api.nvim_set_current_buf(self.buf_id)
+		if self.buf_id ~= nil then
+			self.cur_focus = INSTANCEFOCUS.file
+			vim.api.nvim_set_current_buf(self.buf_id)
+		end
 	end
+end
+
+---@param buf_id integer
+function TerminalInstance:bind(buf_id)
+	self.buf_id = buf_id
+end
+
+function TerminalInstance:unbind()
+	self.buf_id = nil
+end
+
+---@return boolean
+function TerminalInstance:is_binded()
+	return not (self.buf_id == nil)
 end
 
 return TerminalInstance
