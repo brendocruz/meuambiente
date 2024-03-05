@@ -1,3 +1,5 @@
+local utils = require "meuambiente.utils"
+
 ---@class State
 ---@field instances TerminalInstance[]
 local State = {}
@@ -31,6 +33,24 @@ function State:close_instance(term_id)
 			self.instances[key] = nil
 		end
 	end
+end
+
+function State:create_instance()
+
+	-- Get current buffer id.
+	local buf_id = vim.api.nvim_get_current_buf()
+
+	-- Get current buffer path.
+	local path = utils.get_buf_path()
+
+	-- Create terminal path.
+	local term_path = "term://" .. path .. "//bash"
+
+	-- Create new terminal instance.
+	vim.cmd.edit(term_path)
+
+	-- Get terminal id.
+	local term_id = vim.api.nvim_get_current_buf()
 end
 
 return State

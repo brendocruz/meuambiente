@@ -1,7 +1,7 @@
 local utils = require('meuambiente.utils')
 
----@enum InstanceFocus
-local INSTANCEFOCUS = {
+---@enum (key) InstanceFocus
+local instanceFocus = {
 	terminal = 1,
 	file = 2,
 }
@@ -19,12 +19,29 @@ TerminalInstance.__index = TerminalInstance
 ---@param state State
 ---@param bind_term? boolean
 function TerminalInstance.new(state, bind_term)
+
 	-- Get current buffer id.
 	---@type integer | nil
 	local buf_id = vim.api.nvim_get_current_buf()
 
-	-- Get current buffer directory.
-	local path = vim.fn.expand('%:p:h')
+	-- Check if it has to save the current buffer id.
+	if bind_term == false then
+		buf_id = nil
+	elseif utils.is_cur_buf_unnamed() == true then
+		buf_id = nil
+	elseif utils.get_buf_type() == 'terminal' then
+		buf_id = nil
+	end
+
+	-- Set path to the terminal.
+	local path
+	if bind_term == false then
+		-- Set terminal path to the current working directory
+		path = vim.fn.getcwd()
+	else
+		-- Get current buffer path.
+		path = utils.get_buf_path()
+	end
 
 	-- Create terminal path.
 	local term_path = "term://" .. path .. "//bash"
@@ -35,16 +52,11 @@ function TerminalInstance.new(state, bind_term)
 	-- Get terminal id.
 	local term_id = vim.api.nvim_get_current_buf()
 
-	-- Check if it has to bind or if the current buffer is unnamed.
-	if bind_term == false or utils.is_cur_unnamed() == true then
-		buf_id = nil
-	end
-
 	local instance = setmetatable({
 		buf_id = buf_id,
 		term_id = term_id,
 		state = state,
-		cur_focus = INSTANCEFOCUS.file
+		cur_focus = 'file'
 	}, TerminalInstance)
 
 	-- Set autocmd called when the instance is closed.
@@ -59,14 +71,12 @@ function TerminalInstance.new(state, bind_term)
 end
 
 function TerminalInstance:focus()
-	if self.cur_focus == INSTANCEFOCUS.file then
-		self.cur_focus = INSTANCEFOCUS.terminal
+	if self.cur_focus == 'file' or self.buf_id == nil then
+		self.cur_focus = 'terminal'
 		vim.api.nvim_set_current_buf(self.term_id)
 	else
-		if self.buf_id ~= nil then
-			self.cur_focus = INSTANCEFOCUS.file
-			vim.api.nvim_set_current_buf(self.buf_id)
-		end
+		self.cur_focus = 'file'
+		vim.api.nvim_set_current_buf(self.buf_id)
 	end
 end
 
