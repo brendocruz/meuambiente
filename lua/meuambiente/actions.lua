@@ -2,7 +2,6 @@ local state = require('meuambiente.state').new()
 local TerminalInstance = require('meuambiente.instance')
 local utils = require('meuambiente.utils')
 local M = {}
-local count = 1
 
 
 ---@param index integer
@@ -11,7 +10,6 @@ local count = 1
 M.go_to_terminal = function(index, bind_term)
 	-- Check if an instance already exists in the specified index.
 	local instance = state:get_instance(index)
-	count = count + 1
 
 	if instance == nil then
 		instance = TerminalInstance.new(state, bind_term)

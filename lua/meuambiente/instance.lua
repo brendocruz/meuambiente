@@ -19,7 +19,6 @@ TerminalInstance.__index = TerminalInstance
 ---@param state State
 ---@param bind_term? boolean
 function TerminalInstance.new(state, bind_term)
-
 	-- Get current buffer id.
 	---@type integer | nil
 	local buf_id = vim.api.nvim_get_current_buf()
@@ -71,12 +70,22 @@ function TerminalInstance.new(state, bind_term)
 end
 
 function TerminalInstance:focus()
-	if self.cur_focus == 'file' or self.buf_id == nil then
+
+	if self.cur_focus == 'file' then
 		self.cur_focus = 'terminal'
 		vim.api.nvim_set_current_buf(self.term_id)
-	else
+		return
+	end
+
+	if self.buf_id then
 		self.cur_focus = 'file'
 		vim.api.nvim_set_current_buf(self.buf_id)
+		return
+	end
+
+	if self.state.last_file_id then
+		self.cur_focus = 'file'
+		vim.api.nvim_set_current_buf(self.state.last_file_id)
 	end
 end
 
