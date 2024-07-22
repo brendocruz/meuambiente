@@ -87,8 +87,15 @@ function State:run_cur_file()
 	end
 
 	---@type string
-	local command = self.run_config[filetype]
-	command = string.format(command, vim.api.nvim_buf_get_name(0))
+	local command
+
+	if type(self.run_config[filetype]) == 'function' then
+		command = self.run_config[filetype]()
+	else
+		command = self.run_config[filetype]
+		command = string.format(command, vim.api.nvim_buf_get_name(0))
+	end
+
 	local path = vim.fn.getcwd()
 	local term_path = 'term://' .. path .. '//' .. command
 	vim.cmd.edit(term_path)

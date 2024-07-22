@@ -20,7 +20,11 @@ local default_config = {
 		}
 	},
 	run = {
-		python = 'python3 %s'
+		python = function()
+			local command = 'PYTHONPATH=' .. vim.fn.getcwd()
+			command = command .. ' python3 ' .. vim.api.nvim_buf_get_name(0)
+			return command
+		end
 	}
 }
 
