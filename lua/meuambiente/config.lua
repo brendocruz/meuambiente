@@ -12,12 +12,16 @@ local default_config = {
 			['<C-1>'] = mappings.toggle_bind_terminal(1),
 			['<C-2>'] = mappings.toggle_bind_terminal(2),
 			['<C-3>'] = mappings.toggle_bind_terminal(3),
+			['<C-z>'] = mappings.run_cur_file(),
 			['tcc'] = mappings.close_current_terminal(),
 		},
 		nt = {
 
 		}
 	},
+	run = {
+		python = 'python3 %s'
+	}
 }
 
 return default_config

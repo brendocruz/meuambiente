@@ -1,4 +1,5 @@
 local config = require('meuambiente.config')
+local state = require('meuambiente.state').new()
 local M = {}
 
 
@@ -9,6 +10,8 @@ M.setup = function(_)
 			vim.keymap.set(mode, lhs, rhs, opts)
 		end
 	end
+
+	state.run_config = config.run
 end
 
 return M

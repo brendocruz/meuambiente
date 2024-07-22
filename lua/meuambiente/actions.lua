@@ -46,4 +46,11 @@ M.toggle_bind_terminal = function(index)
 	end
 end
 
+
+
+---@return nil
+M.run_cur_file = function()
+	state:run_cur_file()
+end
+
 return M

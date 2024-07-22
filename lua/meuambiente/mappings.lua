@@ -24,4 +24,10 @@ M.toggle_bind_terminal = function(index)
 	end
 end
 
+M.run_cur_file = function()
+	return function()
+		actions.run_cur_file()
+	end
+end
+
 return M
