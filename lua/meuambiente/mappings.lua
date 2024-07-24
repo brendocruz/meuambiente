@@ -2,11 +2,11 @@ local actions = require('meuambiente.actions')
 local M = {}
 
 ---@param index integer
----@param bind_term? boolean
+---@param bindterm? boolean
 ---@return function
-M.go_to_terminal = function(index, bind_term)
+M.goto_terminal = function(index, bindterm)
 	return function()
-		actions.go_to_terminal(index, bind_term)
+		actions.goto_terminal(index, bindterm)
 	end
 end
 

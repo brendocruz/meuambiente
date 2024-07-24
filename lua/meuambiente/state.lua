@@ -1,14 +1,16 @@
-local utils = require "meuambiente.utils"
-
 ---@class State
----@field instances TerminalInstance[]
----@field last_file_id integer | nil
+---@field termbuffers TerminalBuffer[]
+---@field lastfileid integer | nil
 ---@field run_config table
 local State = {}
 State.__index = State
 
+
+
 ---@type State | nil
 local singleton = nil
+
+
 
 ---@return State
 function State.new()
@@ -16,89 +18,65 @@ function State.new()
 		return singleton
 	end
 
-	local new_state = setmetatable({
-		instances = {},
-		last_file_id = 1,
+	local newstate = setmetatable({
+		termbuffers = {},
+		lastfileid = 1,
 		run_config = {}
 	}, State)
 
+	---WARNING
 	vim.api.nvim_create_autocmd({ 'BufLeave' }, {
 		callback = function()
-			new_state:save_cur_file()
+			newstate:update_last_file()
 		end,
 	})
 
-	singleton = new_state
+	singleton = newstate
 	return singleton
 end
 
+
+
+---Get the terminal buffer with the given index.
 ---@param index integer
----@return TerminalInstance
+---@return TerminalBuffer
 function State:get_instance(index)
-	return self.instances[index]
+	return self.termbuffers[index]
 end
 
+
+
+---Set the terminal buffer in the given index.
 ---@param index integer
----@param instance TerminalInstance
----@return TerminalInstance
-function State:set_instance(index, instance)
-	self.instances[index] = instance
-	return self.instances[index]
+---@param termbuffer TerminalBuffer
+---@return TerminalBuffer
+function State:set_instance(index, termbuffer)
+	self.termbuffers[index] = termbuffer
+	return self.termbuffers[index]
 end
 
----@param term_id integer
-function State:close_instance(term_id)
-	for key, instance in pairs(self.instances) do
-		if instance.term_id == term_id then
-			vim.api.nvim_buf_delete(instance.term_id, { force = true })
-			self.instances[key] = nil
+
+
+---Close the terminal buffer with the given id.
+---@param termid integer
+function State:close_instance(termid)
+	for key, instance in pairs(self.termbuffers) do
+		if instance.termid == termid then
+			vim.api.nvim_buf_delete(instance.termid, { force = true })
+			self.termbuffers[key] = nil
 		end
 	end
 end
 
-function State:create_instance()
-	-- Get current buffer id.
-	-- local buf_id = vim.api.nvim_get_current_buf()
 
-	-- Get current buffer path.
-	local path = utils.get_buf_path()
 
-	-- Create terminal path.
-	local term_path = "term://" .. path .. "//bash"
-
-	-- Create new terminal instance.
-	vim.cmd.edit(term_path)
-
-	-- Get terminal id.
-	-- local term_id = vim.api.nvim_get_current_buf()
-end
-
-function State:save_cur_file()
-	-- Get current buffer filename.
-	self.last_file_id = vim.api.nvim_get_current_buf()
-end
-
+---Update the last file variable with the current buffer id.
 ---@return nil
-function State:run_cur_file()
-	local filetype = vim.bo.filetype
-
-	if self.run_config[filetype] == nil then
-		return
-	end
-
-	---@type string
-	local command
-
-	if type(self.run_config[filetype]) == 'function' then
-		command = self.run_config[filetype]()
-	else
-		command = self.run_config[filetype]
-		command = string.format(command, vim.api.nvim_buf_get_name(0))
-	end
-
-	local path = vim.fn.getcwd()
-	local term_path = 'term://' .. path .. '//' .. command
-	vim.cmd.edit(term_path)
+function State:update_last_file()
+	-- Get current buffer filename.
+	self.lastfileid = vim.api.nvim_get_current_buf()
 end
+
+
 
 return State
