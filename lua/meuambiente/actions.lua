@@ -1,6 +1,7 @@
 local utils = require('meuambiente.utils')
-local state = require('meuambiente.state').new()
+local state = require('meuambiente.state')
 local TerminalBuffer = require('meuambiente.terminal')
+-- local config = require('meuambiente.config')
 
 
 local M = {}
@@ -10,11 +11,16 @@ local M = {}
 ---@param bindterm? boolean
 ---@return nil
 M.goto_terminal = function(index, bindterm)
-	local termbuffer = state:get_instance(index)
+	local buftype = utils.get_buf_type()
+	if buftype ~= 'normal' and buftype ~= 'terminal' then
+		return
+	end
+
+	local termbuffer = state.termbuffers[index]
 
 	if termbuffer == nil then
-		termbuffer = TerminalBuffer.new(state, bindterm)
-		state:set_instance(index, termbuffer)
+		termbuffer = TerminalBuffer.new(bindterm)
+		state.termbuffers[index] = termbuffer
 	end
 
 	if termbuffer then
@@ -24,25 +30,19 @@ end
 
 
 
-M.close_terminal = function(index)
-	state:close_instance(state.termbuffers[index].termid)
-end
-
-
-
 M.close_current_terminal = function()
 	if utils.get_buf_type() ~= 'terminal' then
 		return
 	end
-	local bufid = vim.api.nvim_get_current_buf()
-	vim.api.nvim_exec_autocmds('TermClose', { buffer = bufid })
+	local termid = vim.api.nvim_get_current_buf()
+	vim.api.nvim_exec_autocmds('TermClose', { buffer = termid })
 end
 
 
 
 ---@param index integer
 M.toggle_bind_terminal = function(index)
-	local termbuffer = state:get_instance(index)
+	local termbuffer = state.termbuffers[index]
 	local buftype = utils.get_buf_type(0)
 
 	if buftype == 'terminal' then
@@ -57,25 +57,26 @@ end
 
 ---@return nil
 M.run_cur_file = function()
-	local filetype = vim.bo.filetype
+	print('Disabled.')
+	--local filetype = vim.bo.filetype
 
-	if state.run_config[filetype] == nil then
-		return
-	end
+	--if state.run_config[filetype] == nil then
+	--	return
+	--end
 
-	---@type string
-	local command
+	-----@type string
+	--local command
 
-	if type(state.run_config[filetype]) == 'function' then
-		command = state.run_config[filetype]()
-	else
-		command = state.run_config[filetype]
-		command = string.format(command, vim.api.nvim_buf_get_name(0))
-	end
+	--if type(state.run_config[filetype]) == 'function' then
+	--	command = state.run_config[filetype]()
+	--else
+	--	command = state.run_config[filetype]
+	--	command = string.format(command, vim.api.nvim_buf_get_name(0))
+	--end
 
-	local path = vim.fn.getcwd()
-	local termpath = 'term://' .. path .. '//' .. command
-	vim.cmd.edit(termpath)
+	--local path = vim.fn.getcwd()
+	--local termpath = 'term://' .. path .. '//' .. command
+	--vim.cmd.edit(termpath)
 end
 
 

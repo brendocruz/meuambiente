@@ -1,6 +1,17 @@
 local mappings = require('meuambiente.mappings')
 
-local default_config = {
+---@class CommandDescriptor
+---@field variables { string: string | fun(): string }[]
+---@field command string | fun(): string
+
+---@class Config
+---@field mappings? { n: { [string]: fun() }}
+---@field run? { [string]: CommandDescriptor}
+
+local M = {}
+
+---@type Config
+M.config = {
 	mappings = {
 		n = {
 			['<A-1>'] = mappings.goto_terminal(1, false),
@@ -15,27 +26,29 @@ local default_config = {
 			['<C-z>'] = mappings.run_cur_file(),
 			['tcc'] = mappings.close_current_terminal(),
 		},
-		nt = {
-
-		}
 	},
 	run = {
-		python = function()
-			local command = 'PYTHONPATH=' .. vim.fn.getcwd()
-			command = command .. ' python3 ' .. vim.api.nvim_buf_get_name(0)
-			return command
-		end
+		python = {
+			variables = {
+				['PYTHONPATH'] = function() vim.fn.getcwd() end
+			},
+			command = function()
+				local command = 'python3 ' .. vim.api.nvim_buf_get_name(0)
+				command = command .. ' <ARGS>'
+				return command
+			end
+		}
 	}
 }
 
 
-Test = {
-	python = {
-		variables = {
-			['PYTHONPATH'] = function() vim.fn.getcwd() end
-		},
-		command = 'python3'
-	}
-}
+---Update the configuration.
+---@param userconfig Config
+---@return nil
+M.update = function(userconfig)
+	for key, value in pairs(userconfig) do
+		M[key] = value
+	end
+end
 
-return default_config
+return M

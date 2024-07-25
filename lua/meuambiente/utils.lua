@@ -1,5 +1,7 @@
 local M = {}
 
+
+
 ---@enum (key) BufferType
 local buffer_type = {
 	normal   = 1,
@@ -11,6 +13,8 @@ local buffer_type = {
 	terminal = 7,
 	prompt   = 8,
 }
+
+
 
 ---@param bufid? integer
 ---@return BufferType
@@ -25,6 +29,8 @@ M.get_buf_type = function(bufid)
 	end
 	return buftype
 end
+
+
 
 ---@return boolean
 M.is_cur_buf_unnamed = function()
@@ -49,5 +55,7 @@ M.get_buf_path = function(bufid)
 
 	return path
 end
+
+
 
 return M
