@@ -133,10 +133,22 @@ function TabLayout.new(showeditwin)
 
 
 	vim.api.nvim_create_autocmd({ 'WinClosed' }, {
+		once = true,
 		pattern = tostring(instance.termwinid),
 		callback = function()
 			instance.termwinid = 0
 			instance.termbufid = 0
+		end
+	})
+
+
+	vim.api.nvim_create_autocmd({ 'TabClosed' }, {
+		callback = function()
+			for index, valtab in pairs(state.tablayouts) do
+				if valtab.tabpageid == instance.tabpageid then
+					state.tablayouts[index] = nil
+				end
+			end
 		end
 	})
 

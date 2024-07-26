@@ -97,9 +97,10 @@ M.close_current_tablayout = function()
 
 	---@type TabLayout
 	local tablayout
-	for _, valtab in pairs(state.tablayouts) do
+	for key, valtab in pairs(state.tablayouts) do
 		if valtab.tabpageid == tabpageid then
 			tablayout = valtab
+			state.tablayouts[key] = nil
 		end
 	end
 
