@@ -4,6 +4,12 @@ local M = {
 
 	---@type integer | nil
 	lastfileid = 1,
+
+	---@type TabLayout[]
+	tablayouts = {},
+
+	---@type Config
+	config = {},
 }
 
 

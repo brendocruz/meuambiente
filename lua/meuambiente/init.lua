@@ -37,6 +37,8 @@ M.setup = function(userconfig)
 		end
 	end
 
+	state.config = config.config
+
 	add_autocmds()
 end
 

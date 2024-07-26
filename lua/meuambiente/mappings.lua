@@ -40,4 +40,21 @@ end
 
 
 
+---@param index integer
+---@param showeditwin boolean
+M.goto_tablayout = function(index, showeditwin)
+	return function()
+		actions.goto_tablayout(index, showeditwin)
+	end
+end
+
+
+
+M.run_tablayout = function()
+	return function()
+		actions.run_tablayout()
+	end
+end
+
+
 return M

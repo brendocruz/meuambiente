@@ -23,20 +23,20 @@ M.config = {
 			['<C-1>'] = mappings.toggle_bind_terminal(1),
 			['<C-2>'] = mappings.toggle_bind_terminal(2),
 			['<C-3>'] = mappings.toggle_bind_terminal(3),
-			['<C-z>'] = mappings.run_cur_file(),
+			-- ['<C-z>'] = mappings.run_cur_file(),
 			['tcc'] = mappings.close_current_terminal(),
+
+			['<leader>zz'] = mappings.goto_tablayout(1, false),
+			['<leader>z2'] = mappings.goto_tablayout(2, true),
+			['<leader>xx'] = mappings.run_tablayout(),
 		},
 	},
 	run = {
 		python = {
 			variables = {
-				['PYTHONPATH'] = function() vim.fn.getcwd() end
+				['PYTHONPATH'] = function() return vim.fn.getcwd() end
 			},
-			command = function()
-				local command = 'python3 ' .. vim.api.nvim_buf_get_name(0)
-				command = command .. ' <ARGS>'
-				return command
-			end
+			command = 'python3 <FILE> <ARGS>',
 		}
 	}
 }

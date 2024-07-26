@@ -1,7 +1,7 @@
 local utils = require('meuambiente.utils')
 local state = require('meuambiente.state')
 local TerminalBuffer = require('meuambiente.terminal')
--- local config = require('meuambiente.config')
+local TabLayout = require('meuambiente.tablayout')
 
 
 local M = {}
@@ -55,28 +55,40 @@ end
 
 
 
----@return nil
-M.run_cur_file = function()
-	print('Disabled.')
-	--local filetype = vim.bo.filetype
+---Go to the tab layout with the given index.
+---@param index integer
+---@param showeditwin boolean
+M.goto_tablayout = function(index, showeditwin)
+	if state.tablayouts[index] == nil then
+		local filetype = vim.bo.filetype
+		if state.config.run[filetype] == nil then
+			return
+		end
+		state.tablayouts[index] = TabLayout.new(showeditwin)
+		return
+	end
 
-	--if state.run_config[filetype] == nil then
-	--	return
-	--end
+	state.tablayouts[index]:focus()
+end
 
-	-----@type string
-	--local command
 
-	--if type(state.run_config[filetype]) == 'function' then
-	--	command = state.run_config[filetype]()
-	--else
-	--	command = state.run_config[filetype]
-	--	command = string.format(command, vim.api.nvim_buf_get_name(0))
-	--end
 
-	--local path = vim.fn.getcwd()
-	--local termpath = 'term://' .. path .. '//' .. command
-	--vim.cmd.edit(termpath)
+M.run_tablayout = function()
+	local tabpageid = vim.api.nvim_get_current_tabpage()
+
+	---@type TabLayout
+	local tablayout
+	for _, valtab in pairs(state.tablayouts) do
+		if valtab.tabpageid == tabpageid then
+			tablayout = valtab
+		end
+	end
+
+	if tablayout == nil then
+		return
+	end
+
+	tablayout:run()
 end
 
 
