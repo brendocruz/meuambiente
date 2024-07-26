@@ -253,4 +253,14 @@ function TabLayout:focus()
 	self.meinfocus = true
 end
 
+function TabLayout:close()
+	if self.termbufid ~= 0 then
+		vim.api.nvim_buf_delete(self.termbufid, { force = true })
+	end
+
+	if self.argsbufid ~= 0 then
+		vim.api.nvim_buf_delete(self.argsbufid, { force = true })
+	end
+end
+
 return TabLayout

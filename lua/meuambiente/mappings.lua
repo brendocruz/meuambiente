@@ -57,4 +57,12 @@ M.run_tablayout = function()
 end
 
 
+
+M.close_current_tablayout = function()
+	return function()
+		actions.close_current_tablayout()
+	end
+end
+
+
 return M

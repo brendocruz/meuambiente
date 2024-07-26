@@ -92,5 +92,24 @@ M.run_tablayout = function()
 end
 
 
+M.close_current_tablayout = function()
+	local tabpageid = vim.api.nvim_get_current_tabpage()
+
+	---@type TabLayout
+	local tablayout
+	for _, valtab in pairs(state.tablayouts) do
+		if valtab.tabpageid == tabpageid then
+			tablayout = valtab
+		end
+	end
+
+	if tablayout == nil then
+		return
+	end
+
+	tablayout:close()
+end
+
+
 
 return M
